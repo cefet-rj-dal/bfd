@@ -13,23 +13,25 @@ processa_data <- function(data) {
   data <- merge(data, summary)
   data$outlierDuracaoEsperada <- data$DuracaoEsperada > data$outlierDuracaoEsperada 
   data$outlierDuracaoReal <- data$DuracaoReal > data$outlierDuracaoReal 
+  
+
+  
   return(data)  
 }
 
-for (i in 2000:2000) {
+for (i in 2023:2023) {
   fil <- list.files("vra_rdata")
   search <- sprintf("vra_%d", i)
   fil <- fil[(grepl(search, fil))]
 
   fname <- sprintf("vra_rdata/%s", fil)
-  data <- get(load(fname))
-  data <- processa_data(data)
-  vra <- rbind(vra, data)
-
-  fname <- sprintf("vra_rdata/vra_%d.rdata", i)
+  vra <- get(load(fname))
+  vra <- processa_data(vra)
   save(vra, file=fname)
 }
 
-
+vra$expected_depart_date<-as.character(gsub("-","",as.character(vra$expected_depart_date)))
+vra$expected_depart_hour<-substr(as.character(gsub(":","",as.character(vra$expected_depart_time))),1,2)
+vra$expected_depart_time<-NULL
 
 

@@ -8,9 +8,11 @@ compute_threshold <- function(x) {
 }
 
 processa_data <- function(data) {
-  summary <- data |> group_by(route) |> summarise(n = n(), DE = compute_threshold(DuracaoEsperada), DR = compute_threshold(DuracaoReal))
+  summary <- data |> group_by(route) |> summarise(outlierDuracaoEsperada = compute_threshold(DuracaoEsperada), 
+                                                  outlierDuracaoReal = compute_threshold(DuracaoReal))
   data <- merge(data, summary)
-  data <- data |> filter((DuracaoEsperada <= DE) & (is.na(DuracaoReal) | (DuracaoReal <= DR)))
+  data$outlierDuracaoEsperada <- data$DuracaoEsperada > data$outlierDuracaoEsperada 
+  data$outlierDuracaoReal <- data$DuracaoReal > data$outlierDuracaoReal 
   return(data)  
 }
 

@@ -19,7 +19,7 @@ processa_data <- function(data) {
   data$DuracaoEsperada <- as.numeric(difftime(data$ChegadaPrevista, data$PartidaPrevista, units = "mins"))
   
   # Difference in Minutes for real duration
-  data$DuracaoReal<-as.numeric(difftime(data$ChegadaReal, data$PartidaReal, units = "mins"))
+  data$DuracaoReal <- as.numeric(difftime(data$ChegadaReal, data$PartidaReal, units = "mins"))
   
   
   #--- Remove flights that flight_id not filled
@@ -28,23 +28,13 @@ processa_data <- function(data) {
   #--- with the pair of airports of origin and destination respectively
   data$route <- sprintf("%s-%s", data$AeroportoOrigem, data$AeroportoDestino)
   
-  #--- Remove routes that have not been properly formed
-  data <- data |> filter (nchar(data$route)==9)
-  
   #--- Remove flights that expected and real departure and arrival dates are not filled
   data <-data |> filter (!is.na(data$PartidaPrevista) | !is.na(data$ChegadaPrevista))
   
-  data <- data |>
-    filter (is.na(AtrasoPartida) | AtrasoPartida < 1440)
-  
-  data <- data |>
-    filter (is.na(AtrasoChegada) | AtrasoChegada < 1440)
-  
-  #--- filter expected departures <= expected arrivals
-  data <- data |> filter((PartidaPrevista <= ChegadaPrevista))
-  
-  #--- filter real departures <= real arrivals
-  data <- data |> filter(is.na(PartidaReal) | is.na(ChegadaReal) |  (PartidaReal <= ChegadaReal))  
+  data$outlierAtrasoPartida <- data$AtrasoPartida < 1440
+  data$outlierAtrasoChegada <- data$AtrasoChegada < 1440
+  data$outlierPartidaChegadaPrevista <- data$PartidaPrevista <= data$ChegadaPrevista
+  data$outlierPartidaChegadaReal <- data$PartidaReal <= data$ChegadaReal
 
   return(data)  
 }

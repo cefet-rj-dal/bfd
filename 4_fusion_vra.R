@@ -2,6 +2,7 @@ library(stringr)
 library(dplyr)
 library(doParallel)
 
+
 processa_data <- function(data) {
   data$PartidaPrevista <-strptime(data$PartidaPrevista,"%d/%m/%Y %H:%M", tz="GMT")
   data$PartidaReal <-strptime(data$PartidaReal,"%d/%m/%Y %H:%M", tz="GMT")
@@ -58,11 +59,13 @@ processa_yearly_data <- function(data) {
   return(data)  
 }
 
+
 execute_year <- function(i) {
   fil <- list.files("vra_month")
   search <- sprintf("vra_do_mes_%d", i)
   fil <- fil[(grepl(search, fil))]
   vra <- NULL
+  s <- 0
   for (f in fil) {
     fname <- sprintf("vra_month/%s", f)
     print(fname)
@@ -73,12 +76,7 @@ execute_year <- function(i) {
   vra <- processa_yearly_data(vra)
   fname <- sprintf("vra_rdata/vra_%d.rdata", i)
   save(vra, file=fname)
-  return(i)
-}
-
-execute_year_stub <- function(i) {
-  print(i)  
-  return(i)
+  return(s)
 }
 
 myCluster <- makeCluster(detectCores()-1, # number of cores to use
@@ -88,8 +86,10 @@ registerDoParallel(myCluster)
 
 years <- 2000:2023
 
-r <- foreach(i = years, .combine = 'c') %do% {
-  execute_year(i)
+#%dopar%
+r <- foreach(i = years) %do% {
+  s <- execute_year(i)
+  return(s)
 }
 
 stopCluster(myCluster)

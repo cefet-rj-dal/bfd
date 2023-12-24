@@ -77,18 +77,6 @@ execute_year <- function(i) {
   save(vra, file=fname)
 }
 
-myCluster <- makeCluster(detectCores()-1, # number of cores to use
-                         type = "PSOCK") # type of cluster
-
-registerDoParallel(myCluster)
-
-years <- 2000:2023
-
-#%dopar%
-r <- foreach(i = years) %do% {
+for (i in 2000:2023) {
   execute_year(i)
-  return(i)
 }
-
-stopCluster(myCluster)
-

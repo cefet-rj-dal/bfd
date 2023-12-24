@@ -17,29 +17,38 @@ col_names <-c("Sigla",
     "Justificativa"
   )
 
+
+if(FALSE) {
+  data <- read_delim("vra/vra_do_mes_2023_10.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE)
+  colnames(data) <- c("Sigla", "Voo", "DI", "TipoLinha", "AeroportoOrigem",
+                      "PartidaPrevista", "PartidaReal", "AeroportoDestino",
+                      "ChegadaPrevista", "ChegadaReal", "Situacao")
+  data$Justificativa <- ""
+  data <- data[,col_names]
+  write.table(data, file="vra_do_mes_2023_10.csv", quote=FALSE, sep=";", row.names = FALSE)
+}
+
+
+
 fil <- list.files("vra")
 process <- NULL
 for (f in fil) {
   filecsv <- sprintf("vra/%s", f)
-  filerdata <- sprintf("vra_rdata/%s", str_replace(f, ".csv", ".rdata"))
+  filerdata <- sprintf("vra_month/%s", str_replace(f, ".csv", ".rdata"))
   data <- read_delim(filecsv, delim = ";", escape_double = FALSE, trim_ws = TRUE)
   col <- ncol(data)
-  if (col == 13) {
-    data[,colnames(data) == "Data Prevista"] <- NULL
-    col <- ncol(data)
-  }
-  if (col == 11) {
-    data$Justificativa <- ""
-    col <- ncol(data)
-  }
   if (col == 1) {
     data <- read_delim(filecsv, delim = ",", escape_double = FALSE, trim_ws = TRUE)
     col <- ncol(data)
-    if (col != 12) {
+    if (col == 1) {
       data <- read_delim(filecsv, delim = "\t", escape_double = FALSE, trim_ws = TRUE)
       col <- ncol(data)
     }
   }
+  data[,colnames(data) == "Data Prevista"] <- NULL
+  data[,colnames(data) == "Grupo DI"] <- NULL
+  if (!("Justificativa" %in% colnames(data)))
+    data$Justificativa <- ""
   if (col == 12) {
     colnames(data) <- col_names
     save(data, file=filerdata)

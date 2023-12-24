@@ -46,7 +46,7 @@ process <- function(fileasos, filevra, filebfd) {
   return(nrow(bfd)/nrow(vra))
 }
 
-for (i in 2000:2023) {
+for (i in 2014:2023) {
   fileasos <- sprintf("asos_rdata/asos%d.rdata", i)
   filevra <- sprintf("vra_rdata/vra_%d.rdata", i)
   filebfd <- sprintf("bfd_%d.rdata", i)

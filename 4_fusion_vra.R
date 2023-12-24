@@ -4,20 +4,20 @@ library(doParallel)
 
 
 processa_data <- function(data) {
-  data$PartidaPrevista <-strptime(data$PartidaPrevista,"%d/%m/%Y %H:%M", tz="GMT")
-  data$PartidaReal <-strptime(data$PartidaReal,"%d/%m/%Y %H:%M", tz="GMT")
+  data$PartidaPrevista <- strptime(data$PartidaPrevista,"%d/%m/%Y %H:%M", tz="GMT")
+  data$PartidaReal <- strptime(data$PartidaReal,"%d/%m/%Y %H:%M", tz="GMT")
   
-  data$ChegadaPrevista <-strptime(data$ChegadaPrevista,"%d/%m/%Y %H:%M", tz="GMT")
-  data$ChegadaReal <-strptime(data$ChegadaReal,"%d/%m/%Y %H:%M", tz="GMT")
+  data$ChegadaPrevista <- strptime(data$ChegadaPrevista,"%d/%m/%Y %H:%M", tz="GMT")
+  data$ChegadaReal <- strptime(data$ChegadaReal,"%d/%m/%Y %H:%M", tz="GMT")
   
-  data$PartidaPrevista_dia <-date(data$PartidaPrevista)
+  data$PartidaPrevista_dia <- date(data$PartidaPrevista)
   data$PartidaPrevista_hora <- hour(data$PartidaPrevista) 
   
   # Difference in Minutes for departures
-  data$AtrasoPartida <-as.numeric(difftime(data$PartidaReal, data$PartidaPrevista, units = "mins"))
+  data$AtrasoPartida <- as.numeric(difftime(data$PartidaReal, data$PartidaPrevista, units = "mins"))
   
   # Difference in Minutes for arrivals
-  data$AtrasoChegada <-as.numeric(difftime(data$ChegadaReal, data$ChegadaPrevista, units = "mins"))
+  data$AtrasoChegada <- as.numeric(difftime(data$ChegadaReal, data$ChegadaPrevista, units = "mins"))
   
   # Difference in Minutes for expected duration
   data$DuracaoEsperada <- as.numeric(difftime(data$ChegadaPrevista, data$PartidaPrevista, units = "mins"))
@@ -35,10 +35,10 @@ processa_data <- function(data) {
   #--- Remove flights that expected and real departure and arrival dates are not filled
   data <- data |> dplyr::filter(!is.na(PartidaPrevista) | !is.na(ChegadaPrevista))
   
-  data$outlierAtrasoPartida <- data$AtrasoPartida < 1440
-  data$outlierAtrasoChegada <- data$AtrasoChegada < 1440
-  data$outlierPartidaChegadaPrevista <- data$PartidaPrevista <= data$ChegadaPrevista
-  data$outlierPartidaChegadaReal <- data$PartidaReal <= data$ChegadaReal
+  data$outlierAtrasoPartida <- data$AtrasoPartida > 1440
+  data$outlierAtrasoChegada <- data$AtrasoChegada > 1440
+  data$outlierPartidaChegadaPrevista <- data$PartidaPrevista > data$ChegadaPrevista
+  data$outlierPartidaChegadaReal <- data$PartidaReal > data$ChegadaReal
 
   return(data)  
 }
@@ -65,7 +65,6 @@ execute_year <- function(i) {
   search <- sprintf("vra_do_mes_%d", i)
   fil <- fil[(grepl(search, fil))]
   vra <- NULL
-  s <- 0
   for (f in fil) {
     fname <- sprintf("vra_month/%s", f)
     print(fname)
@@ -76,7 +75,6 @@ execute_year <- function(i) {
   vra <- processa_yearly_data(vra)
   fname <- sprintf("vra_rdata/vra_%d.rdata", i)
   save(vra, file=fname)
-  return(s)
 }
 
 myCluster <- makeCluster(detectCores()-1, # number of cores to use
@@ -88,8 +86,8 @@ years <- 2000:2023
 
 #%dopar%
 r <- foreach(i = years) %do% {
-  s <- execute_year(i)
-  return(s)
+  execute_year(i)
+  return(i)
 }
 
 stopCluster(myCluster)

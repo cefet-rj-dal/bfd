@@ -47,8 +47,11 @@ for (f in fil) {
   }
   data[,colnames(data) == "Data Prevista"] <- NULL
   data[,colnames(data) == "Grupo DI"] <- NULL
-  if (!("Justificativa" %in% colnames(data)))
+  col <- ncol(data)
+  if (col == 11) {
     data$Justificativa <- ""
+    col <- ncol(data)
+  }
   if (col == 12) {
     colnames(data) <- col_names
     save(data, file=filerdata)

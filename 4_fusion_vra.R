@@ -1,7 +1,6 @@
 library(stringr)
 library(dplyr)
-#library(lubridate)
-
+library(doParallel)
 
 processa_data <- function(data) {
   data$PartidaPrevista <-strptime(data$PartidaPrevista,"%d/%m/%Y %H:%M", tz="GMT")
@@ -27,13 +26,13 @@ processa_data <- function(data) {
   
   
   #--- Remove flights that flight_id not filled
-  data <- data |> filter (data$Voo !='')
+  data <- data |> dplyr::filter(Voo !='')
   
   #--- with the pair of airports of origin and destination respectively
   data$route <- sprintf("%s-%s", data$AeroportoOrigem, data$AeroportoDestino)
   
   #--- Remove flights that expected and real departure and arrival dates are not filled
-  data <-data |> filter (!is.na(data$PartidaPrevista) | !is.na(data$ChegadaPrevista))
+  data <- data |> dplyr::filter(!is.na(PartidaPrevista) | !is.na(ChegadaPrevista))
   
   data$outlierAtrasoPartida <- data$AtrasoPartida < 1440
   data$outlierAtrasoChegada <- data$AtrasoChegada < 1440
@@ -59,14 +58,14 @@ processa_yearly_data <- function(data) {
   return(data)  
 }
 
-
-for (i in 2000:2023) {
+execute_year <- function(i) {
   fil <- list.files("vra_month")
   search <- sprintf("vra_do_mes_%d", i)
   fil <- fil[(grepl(search, fil))]
   vra <- NULL
   for (f in fil) {
-    fname <- sprintf("vra_rdata/%s", f)
+    fname <- sprintf("vra_month/%s", f)
+    print(fname)
     data <- get(load(fname))
     data <- processa_data(data)
     vra <- rbind(vra, data)
@@ -74,8 +73,24 @@ for (i in 2000:2023) {
   vra <- processa_yearly_data(vra)
   fname <- sprintf("vra_rdata/vra_%d.rdata", i)
   save(vra, file=fname)
+  return(i)
 }
 
+execute_year_stub <- function(i) {
+  print(i)  
+  return(i)
+}
 
+myCluster <- makeCluster(detectCores()-1, # number of cores to use
+                         type = "PSOCK") # type of cluster
 
+registerDoParallel(myCluster)
+
+years <- 2000:2023
+
+r <- foreach(i = years, .combine = 'c') %do% {
+  execute_year(i)
+}
+
+stopCluster(myCluster)
 

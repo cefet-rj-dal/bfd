@@ -36,7 +36,7 @@ process <- function(fileasos, filevra, filebfd) {
   asos$dew_point <- (asos$dew_point - 32) * 5/9
   asos$apparent_temperature <- (asos$apparent_temperature - 32) * 5/9
   asos$wind_speed_scale <- ordered(cut(asos$wind_speed,
-                                                     c(0,1,3,6,10,16,21,27,33,40,47,55,63,100),
+                                                     c(-1,1,3,6,10,16,21,27,33,40,47,55,63,1000),
                                                      labels = c("Calm",
                                                                 "Light Air",
                                                                 "Light Breeze",
@@ -52,7 +52,7 @@ process <- function(fileasos, filevra, filebfd) {
                                                                 "Hurricane")))  
   
   asos$wind_direction_cat <- ordered(cut(asos$wind_direction,
-                                                       c(0,11,33,56,78,101,123,146,168,191,213,236,258,281,303,326,348,360),
+                                                       c(-1,11,33,56,78,101,123,146,168,191,213,236,258,281,303,326,348,361),
                                                        labels = c("N",
                                                                   "NNE",
                                                                   "NE",
@@ -72,7 +72,7 @@ process <- function(fileasos, filevra, filebfd) {
                                                                   "N")))
   
   asos$day_period <- ordered(cut(asos$station_hour,
-                                                   c(-1,4,8,10,12,16,19,22,24),
+                                                   c(-1,4,8,10,12,16,19,22,25),
                                                    labels = c("Night",
                                                               "Early Morning",
                                                               "Mid Morning",

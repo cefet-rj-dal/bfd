@@ -2,6 +2,8 @@ library(stringr)
 library(dplyr)
 library(lubridate)
 
+
+# documentacao das colunas https://mesonet.agron.iastate.edu/request/download.phtml?network=BR__ASOS
 process <- function(fileasos, filevra, filebfd) {
   asos <- get(load(fileasos))
   vra <- get(load(filevra))
@@ -24,10 +26,11 @@ process <- function(fileasos, filevra, filebfd) {
   
   asos <-asos |> select(station, station_date, station_hour, lon, lat, 
                         elevation, tmpf, dwpf, relh, drct, sknt, p01i, alti, vsby, feel) |>
-    group_by(station, station_date, station_hour) |> summarise(lon = max(lon), lat = max(lat), elevation = max(elevation),
-                                                               tmpf = max(tmpf), dwpf = max(dwpf), relh = max(relh),
-                                                               drct = max(drct), sknt = max(sknt), p01i = max(p01i),
-                                                               alti = max(alti), vsby = max(vsby), feel = max(feel))
+    group_by(station, station_date, station_hour) |> 
+    summarise(lon = max(lon), lat = max(lat), elevation = max(elevation),
+        air_temperature = max(tmpf), dew_point = max(dwpf), relative_humidity = max(relh),
+        wind_direction = max(drct), wind_speed = max(sknt), precipitation = max(p01i),
+        pressure = max(alti), visibility = max(vsby), apparent_temperature = max(feel))
   asos_depart <- asos
   colnames(asos_depart)[4:ncol(asos_depart)] <- sprintf("%s_depart", colnames(asos_depart)[4:ncol(asos_depart)])
   asos_arrival <- asos

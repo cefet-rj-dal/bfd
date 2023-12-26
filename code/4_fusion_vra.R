@@ -1,7 +1,6 @@
 library(stringr)
 library(dplyr)
-library(doParallel)
-
+library(lubridate)
 
 processa_data <- function(data) {
   data$PartidaPrevista <- strptime(data$PartidaPrevista,"%d/%m/%Y %H:%M", tz="GMT")

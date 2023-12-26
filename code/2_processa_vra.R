@@ -19,18 +19,6 @@ col_names <-c("Sigla",
   )
 
 
-if(FALSE) {
-  data <- read_delim("vra/vra_do_mes_2023_10.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE)
-  colnames(data) <- c("Sigla", "Voo", "DI", "TipoLinha", "AeroportoOrigem",
-                      "PartidaPrevista", "PartidaReal", "AeroportoDestino",
-                      "ChegadaPrevista", "ChegadaReal", "Situacao")
-  data$Justificativa <- ""
-  data <- data[,col_names]
-  write.table(data, file="vra_do_mes_2023_10.csv", quote=FALSE, sep=";", row.names = FALSE)
-}
-
-
-
 fil <- list.files("vra")
 process <- NULL
 for (f in fil) {
@@ -58,5 +46,7 @@ for (f in fil) {
     save(data, file=filerdata)
   }
   process <- rbind(process, data.frame(file = f, col = col))
+  print(filecsv)
 }
+
 ex <- process[process$col != 12, ]

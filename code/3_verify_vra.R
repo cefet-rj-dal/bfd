@@ -10,9 +10,10 @@ for (f in fil) {
   data <- get(load(fname))
   result <- rbind(result, data.frame(f = f, origem = length(table(data$AeroportoOrigem)),
       destino = length(table(data$AeroportoDestino)), cols = colnames(data)))
+  print(fname)
 }
 
 write.table(result, file="result.csv", quote=FALSE, sep=";", row.names = FALSE)
 
 x <- result |> group_by(f) |> summarise(n = n())
-table(x$n)
+print(table(x$n))

@@ -5,7 +5,7 @@ library(stringr)
 #https://mesonet.agron.iastate.edu/ASOS/
 
 
-cols_rm <- c("mslp", "gust", "skyc1", "skyc2", "skyc3", "skyc4", "skyl1", "skyl2", "skyl3", "skyl4",  
+cols_rm <- c("mslp", "gust", "skyc2", "skyc3", "skyc4", "skyl1", "skyl2", "skyl3", "skyl4", "p01i",
              "wxcodes", "ice_accretion_1hr", "ice_accretion_3hr", "ice_accretion_6hr", "peak_wind_gust", "peak_wind_drct",
              "peak_wind_time", "snowdepth", "metar")
 

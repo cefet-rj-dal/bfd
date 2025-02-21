@@ -2,6 +2,7 @@ library(readr)
 library(stringr)
 
 #https://www.gov.br/anac/pt-br/assuntos/dados-e-estatisticas/historico-de-voos
+#os dados de 2000-2009 não podem ser baixados pois estão piores do que estão no repositorio atual
 #iconv -f "windows-1252" -t "UTF-8" vra_do_mes_2000_01.csv -o ../vra_do_mes_2000_01.csv
 
 col_names <-c("Sigla",

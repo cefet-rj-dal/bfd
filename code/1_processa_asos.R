@@ -1,5 +1,5 @@
 library(readr)
-library(stringr)
+library(stringr) 
 
 #unzip asos2000.zip
 #https://mesonet.agron.iastate.edu/ASOS/

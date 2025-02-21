@@ -8,17 +8,41 @@ process <- function(fileasos, filevra, filebfd) {
   asos <- get(load(fileasos))
   vra <- get(load(filevra))
   
+  vra$Periodo_Partida <- ordered(cut(vra$PartidaPrevista_hora,
+                                       c(-1,4,8,10,12,16,19,22,25),
+                                       labels = c("Night",
+                                                  "Early Morning",
+                                                  "Mid Morning",
+                                                  "Late Morning",
+                                                  "Afternoon",
+                                                  "Early Evening",
+                                                  "Late Evening", "Night")))      
+  
+  vra$Periodo_Chegada <- ordered(cut(vra$ChegadaPrevista_hora,
+                                        c(-1,4,8,10,12,16,19,22,25),
+                                        labels = c("Night",
+                                                   "Early Morning",
+                                                   "Mid Morning",
+                                                   "Late Morning",
+                                                   "Afternoon",
+                                                   "Early Evening",
+                                                   "Late Evening", "Night")))      
+  
+  
+  
   vra <- vra |> select(route, company = Sigla, flight = Voo, di = DI, type = TipoLinha, 
                        depart = AeroportoOrigem, arrival = AeroportoDestino, 
-                       expected_depart_date = PartidaPrevista_dia, expected_depart_hour = PartidaPrevista_hora, 
+                       expected_depart_date = PartidaPrevista_dia, expected_depart_hour = PartidaPrevista_hora, depart_day_period = Periodo_Partida,
+                       expected_arrival_date = ChegadaPrevista_dia, expected_arrival_hour = ChegadaPrevista_hora, arrival_day_period = Periodo_Chegada, 
                        expected_depart = PartidaPrevista, real_depart = PartidaReal, 
                        expected_arrival = ChegadaPrevista, real_arrival = ChegadaReal,
-                       status = Situacao, observation = Justificativa,
+                       status_depart = SituacaoPartida, status_arrival = SituacaoChegada, observation = Justificativa,
                        delay_depart = AtrasoPartida, delay_arrival = AtrasoChegada,
                        expected_flight_length = DuracaoEsperada, real_flight_length = DuracaoReal,
                        outlier_depart_delay = outlierAtrasoPartida, outlier_arrival_delay = outlierAtrasoChegada,
                        outlier_expected_flight_consistency = outlierPartidaChegadaPrevista, outlier_real_flight_consistency = outlierPartidaChegadaReal, 
                        outlier_expected_flight_length = outlierDuracaoEsperada,  outlier_real_flight_length = outlierDuracaoReal)
+  
   
   asos$station_date <- date(asos$valid)
   asos$station_hour <- hour(asos$valid)
@@ -71,24 +95,11 @@ process <- function(fileasos, filevra, filebfd) {
                                                                   "NNW",
                                                                   "N")))
   
-  asos$day_period <- ordered(cut(asos$station_hour,
-                                                   c(-1,4,8,10,12,16,19,22,25),
-                                                   labels = c("Night",
-                                                              "Early Morning",
-                                                              "Mid Morning",
-                                                              "Late Morning",
-                                                              "Afternoon",
-                                                              "Early Evening",
-                                                              "Late Evening", "Night")))  
-  
-  
-  
-  
   asos_depart <- asos
   colnames(asos_depart)[4:ncol(asos_depart)] <- sprintf("depart_%s", colnames(asos_depart)[4:ncol(asos_depart)])
   asos_arrival <- asos
   colnames(asos_arrival)[4:ncol(asos_arrival)] <- sprintf("arrival_%s", colnames(asos_arrival)[4:ncol(asos_arrival)])
-  
+
   bfd <- merge(x = vra, y = asos_depart, 
                by.x = c("depart", "expected_depart_date", "expected_depart_hour"), 
                by.y = c("station", "station_date", "station_hour"))
@@ -100,12 +111,15 @@ process <- function(fileasos, filevra, filebfd) {
   bfd$expected_depart_date <- NULL
   bfd$expected_depart_hour <- NULL
   
+  bfd$expected_arrival_date <- NULL
+  bfd$expected_arrival_hour <- NULL
+
   save(bfd, file = filebfd)
   
   return(nrow(bfd)/nrow(vra))
 }
 
-for (i in 2000:2023) {
+for (i in 2000:2024) {
   fileasos <- sprintf("asos_rdata/asos%d.rdata", i)
   filevra <- sprintf("vra_rdata/vra_%d.rdata", i)
   filebfd <- sprintf("bfd_%d.rdata", i)

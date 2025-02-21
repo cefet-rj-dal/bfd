@@ -12,6 +12,10 @@ processa_data <- function(data) {
   data$PartidaPrevista_dia <- date(data$PartidaPrevista)
   data$PartidaPrevista_hora <- hour(data$PartidaPrevista) 
   
+  data$ChegadaPrevista_dia <- date(data$ChegadaPrevista)
+  data$ChegadaPrevista_hora <- hour(data$ChegadaPrevista) 
+  
+  
   # Difference in Minutes for departures
   data$AtrasoPartida <- as.numeric(difftime(data$PartidaReal, data$PartidaPrevista, units = "mins"))
   

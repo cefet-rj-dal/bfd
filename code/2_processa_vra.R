@@ -15,9 +15,25 @@ col_names <-c("Sigla",
     "PartidaReal",
     "ChegadaPrevista",
     "ChegadaReal",
-    "Situacao",
+    "SituacaoPartida",
     "Justificativa"
   )
+
+
+col_names_v2 <-c("Sigla",
+              "Voo",
+              "DI",
+              "TipoLinha",
+              "AeroportoOrigem",
+              "AeroportoDestino",
+              "PartidaPrevista",
+              "PartidaReal",
+              "ChegadaPrevista",
+              "ChegadaReal",
+              "SituacaoPartida",
+              "SituacaoChegada",
+              "Justificativa"
+)
 
 
 fil <- list.files("vra")
@@ -44,6 +60,8 @@ for (f in fil) {
   }
   if (col == 12) {
     colnames(data) <- col_names
+    data$SituacaoChegada <- data$SituacaoPartida
+    data <- data[,col_names_v2]
     save(data, file=filerdata)
   }
   process <- rbind(process, data.frame(file = f, col = col))

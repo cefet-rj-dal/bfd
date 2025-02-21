@@ -76,6 +76,6 @@ execute_year <- function(i) {
   save(vra, file=fname)
 }
 
-for (i in 2000:2023) {
+for (i in 2000:2024) {
   execute_year(i)
 }

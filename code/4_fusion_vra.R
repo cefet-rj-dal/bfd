@@ -61,7 +61,7 @@ processa_yearly_data <- function(data) {
 
 execute_year <- function(i) {
   fil <- list.files("vra_month")
-  search <- sprintf("vra_do_mes_%d", i)
+  search <- sprintf("VRA_%d", i)
   fil <- fil[(grepl(search, fil))]
   vra <- NULL
   for (f in fil) {
